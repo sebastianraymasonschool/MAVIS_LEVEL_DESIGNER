@@ -1,0 +1,398 @@
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
+  margin: 0;
+  background-color: #000000;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #333;
+}
+
+#header {
+  background-color: #000000;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  text-align: center;
+  width: 50%;
+}
+
+#header h1 {
+  margin: 0 0 10px;
+  font-size: 32px;
+  color: #92c6ff;
+}
+
+#header p {
+  margin: 0;
+  font-size: 19px;
+  color: #dcdcdc;
+}
+
+#header a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+
+#header a:hover {
+  color: #0056b3;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
+  width: 60%;
+  transform: translate(-5%);
+}
+
+#sidebar {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 200px;
+  box-sizing: border-box;
+  transform: translate(-2%);
+}
+
+#tools {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.tool {
+  padding: 10px 16px;
+  margin: 8px 0;
+  width: 120px;
+  background-color: #e9ecf0;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.tool.selected,
+.tool:hover {
+  background-color: #696969;
+  font-weight: bold;
+  color: #e9ecf0;
+  transform: translateY(-2px);
+}
+#map-wrapper {
+  display: flex;
+  justify-content: center; /* Center the grid horizontally */
+  align-items: center; /* Center the grid vertically */
+  position: relative; /* Makes this the reference point for absolute positioning */
+  width: fit-content; /* Ensure it matches the content size */
+  height: fit-content; /* Ensure it matches the content size */
+  margin: 0 auto; /* Center the wrapper within its parent */
+}
+
+#initial-state-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+  position: relative; /* Key fix to align goal container with initial container */
+  width: fit-content; /* Ensures the wrapper matches content size */
+}
+
+
+#initial-state-container, #goal-state-container {
+  display: grid;
+  background-color: #fff; /* White background */
+  padding: 15px; /* Same padding */
+  border-radius: 12px; /* Rounded corners */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Same shadow */
+  width: fit-content; /* Match the container size to the content */
+  height: fit-content; /* Match the container size to the content */
+  position: relative; /* Base position for flexibility */
+}
+
+#initial-state-container {
+  display: grid;
+  gap: 2px; /* This will now also be set dynamically via JavaScript */
+}
+
+
+#goal-state-container {
+  position: -20px; /* Position relative to #map-wrapper */
+  top: 0; /* Align with the top of the wrapper */
+  left: 0; /* Align with the left of the wrapper */
+  z-index: 10; /* Ensure it appears above the initial container */
+  pointer-events: auto; /* Prevent interactions */
+}
+
+
+.hidden {
+  display: none;
+}
+
+.cell {
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
+  border: 1px solid #e0e5ec;
+  text-align: center;
+  line-height: 40px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  position: relative;
+}
+
+.agent-circle, .agent-circle-goal {
+  background-color: #007bff;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%; /* Make it a circle */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+}
+
+.box-div, .box-div-goal {
+  background-color: #f9e79f;
+  color: black;
+  width: 36px;
+  height: 36px;
+  border-radius: 5%; /* Slight rounding */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  font-size: 18px;
+}
+
+.cell.wall {
+    background-color: #6c757d;
+}
+.cell-goal {
+  background-color: #fffbea;
+  border: 2px dashed #ffc107;
+}
+#grid-size-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px; /* Space between rows */
+}
+
+
+.grid-size-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* Space between the height and width columns */
+}
+
+.grid-size-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.grid-size-col label {
+  font-size: 14px;
+  margin-bottom: 5px; /* Space between label and input */
+  color: #333;
+  transform: translate(0,-120%);
+}
+
+.grid-size-col input {
+  width: 40px;
+  padding: 6px;
+  font-size: 14px;
+  border-radius: 10px;
+  border: 2px solid #f1f1f1;
+  text-align: center;
+  transform: translate(0,-50%);
+}
+
+
+
+#goal-toggle-btn:hover img, #export-btn:hover img {
+    transform: rotate(10deg);
+}
+
+#export-btn {
+  background-color: #007bff; /* Color for the download button */
+  transform: translate(5%);
+}
+
+#export-btn:hover {
+  background-color: #0056b3;
+}
+#button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px; /* Space between buttons */
+  margin-left: 0; /* Center-align container */
+  transform: translate(0, 5%);
+}
+
+#goal-toggle-btn, #export-btn, #reset-btn, #goal-slider-container {
+  width: 80px;
+  height: 80px;
+  background-color: #28a745; /* Green color for Goal Toggle */
+  color: white;
+  border: none;
+  border-radius: 60px; /* Circular button */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+#goal-toggle-btn:hover, #export-btn:hover, #reset-btn:hover, #goal-slider-container:hover {
+  background-color: #218838; /* Hover color */
+  transform: scale(1.02); /* Slight scale on hover */
+}
+
+#goal-slider-container {
+  background-color: #28a745; /* Match green theme for Goal Toggle */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#goal-slider-container label {
+  font-size: 14px; /* Smaller "Goal" text */
+  color: white; /* White for better visibility */
+  margin-bottom: 5px; /* Space between text and slider */
+  text-align: center;
+  transform: translate(0,10%);
+}
+
+#goal-slider {
+  appearance: none;
+  width: 50px;
+  height: 20px;
+  background-color: #ccc;
+  border-radius: 15px;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.3s;
+  transform: translate(0,-10%);
+}
+
+#goal-slider:checked {
+  background-color: #ffc107; /* Yellow for active goal mode */
+}
+
+#goal-slider:before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-color: #fff;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#goal-slider:checked:before {
+  transform: translateX(30px);
+}
+
+#reset-btn, #export-btn {
+  width: 80px;
+  height: 80px;
+  background-color: #007bff; /* Match blue theme for buttons */
+  color: white;
+  border: none;
+  border-radius: 60px; /* Circular button */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+#reset-btn:hover, #export-btn:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+  transform: scale(1.02); /* Slight scale on hover */
+  transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transition */
+}
+
+#reset-btn.spin {
+  animation: spin 0.6s cubic-bezier(0.6, 0.1, 0.4, 1); /* Fast at the start, slows at the end */
+}
+
+#reset-btn img, #export-btn img {
+  width: 50px;
+  height: 50px;
+  transition: transform 0.3s ease-in-out;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg); /* Start spin at 0 degrees */
+  }
+  to {
+    transform: rotate(720deg); /* End spin at 360 degrees */
+  }
+}
+
+/* Tooltip Styles */
+.tooltip {
+  position: relative; /* Relative positioning for the tooltip */
+  cursor: pointer; /* Indicates interactivity */
+}
+
+.tooltip::after {
+  content: attr(data-tooltip); /* Display custom tooltip text */
+  position: absolute;
+  bottom: 7%; /* Position tooltip above the element */
+  left: 180%;
+  transform: translateX(-50%);
+  background-color: rgba(210, 210, 210, 0.8);
+  color: rgb(255, 255, 255);
+  padding: 10px 10px; /* Increase padding for a bigger box */
+  border-radius: 8px; /* Optional: Rounded corners */
+  white-space: pre-wrap; /* Preserve whitespace and line breaks */
+  font-size: 10px; /* Increase font size */
+  opacity: 0; /* Start invisible */
+  pointer-events: none; /* Prevent tooltip blocking interactions */
+  transition: opacity 0.2s ease-in-out;
+  z-index: 10;
+
+  /* Force width */
+  width: 80px; /* Set a fixed width */
+  text-align: center; /* Center-align text */
+}
+
+.tooltip:hover::after {
+  opacity: 1; /* Show tooltip on hover */
+  transition: 0.5s .5s ease-in-out;
+}
+

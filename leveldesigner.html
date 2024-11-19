@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <title>Sokoban Map Creator</title>
+</head>
+<body>
+  <header id="header">
+    <h1>MAvis Level Designer</h1>
+    <p>
+      The following tool is the official MAvis level designer for the Mavis Hospital Environment (DTU) for the course Artificial Intelligence at DIS - Study Abroad. Full Python repository @ <a href="https://github.com/AI-DIS/MAvis-assignment" target="_blank">DIS AI Github</a>.
+    </p>
+  </header>
+  <div class="main-content">
+    <div id="sidebar">
+      <h3>Grid Size</h3>
+      <div id="grid-size-controls">
+        <div class="grid-size-row">
+          <div class="grid-size-col">
+            <label for="grid-height">Height</label>
+            <input type="number" id="grid-height" min="3" max="20" value="7">
+          </div>
+          <div class="grid-size-col">
+            <label for="grid-width">Width</label>
+            <input type="number" id="grid-width" min="3" max="20" value="13">
+          </div>
+        </div>
+      </div>
+      <div id="tools" style="display: block;"> <!-- Initial tools -->
+        <h3>Cell Types</h3>
+        <div class="tool" data-type=" ">Empty</div>
+        <div class="tool" data-type="+">Wall</div>
+        <div class="tool" data-type="0">Agent</div>
+        <div class="tool" data-type="1">Box</div>
+      </div>
+      <div id="goal-tools" style="display: none;"> <!-- Goal-specific tools -->
+        <h3>Goal Tools</h3>
+        <div class="tool" data-type="0">Agent</div>
+        <div class="tool" data-type="1">Box</div>
+      </div>
+    </div>
+    <div id="map-wrapper">
+      <div id="initial-state-container"></div> <!-- Initial state map editor -->
+      <div id="goal-state-container" style="display: none;"></div> <!-- Goal state editor -->
+    </div>
+    <div id="button-container">
+      <button id="reset-btn" class="tooltip" data-tooltip="Reset the grid in both the initial state and goal state">
+        <img src="reset-icon.png" alt="Reset Grid" id="reset-img">
+      </button>
+      <div id="goal-slider-container" class="tooltip" data-tooltip="Toggle between the initial state (off) and the goal state (on)">
+        <label for="goal-slider">Goal</label>
+        <input type="checkbox" id="goal-slider">
+      </div>
+      <button id="export-btn" class="tooltip" data-tooltip="Export your level in the .lvl format ready for the searchclient">
+        <img src="download-icon.png" alt="Download Level" id="download-img">
+      </button>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

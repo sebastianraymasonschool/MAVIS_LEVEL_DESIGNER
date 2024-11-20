@@ -170,8 +170,8 @@ body {
 }
 
 .box-div, .box-div-goal {
-  background-color: #f9e79f;
-  color: black;
+  background-color: #007bff;
+  color: white;
   width: 36px;
   height: 36px;
   border-radius: 5%; /* Slight rounding */

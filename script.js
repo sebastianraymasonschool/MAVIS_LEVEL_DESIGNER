@@ -363,6 +363,7 @@ function applyTool(cell, x, y) {
       cell.textContent = '';
       initialAgentCounter--; // Decrement the agent counter
       reindexAgents(); // Reindex agents to maintain order
+      resetGoalMapData();
     } 
     // Remove a box if the cell contains an uppercase letter
     else if (/^[A-Z]$/.test(currentValue)) {
@@ -370,6 +371,7 @@ function applyTool(cell, x, y) {
       cell.textContent = '';
       initialBoxCounter--; // Decrement the box counter
       reindexBoxes(); // Reindex boxes to maintain order
+      resetGoalMapData();
     }
     // Simply set the cell to empty if it contains other values
     else {
@@ -718,3 +720,4 @@ ${goalState}
 
 // Initial grid setup
 createGrid();
+

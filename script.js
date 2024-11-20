@@ -371,6 +371,7 @@ function applyTool(cell, x, y) {
       cell.textContent = '';
       initialAgentCounter--; // Decrement the agent counter
       reindexAgents(); // Reindex agents to maintain order
+      isDrawing = false;
       alert("Agent removed from initial state! Re-indexed and goal state reset.");
       resetGoalMapData();
     } 
@@ -380,6 +381,7 @@ function applyTool(cell, x, y) {
       cell.textContent = '';
       initialBoxCounter--; // Decrement the box counter
       reindexBoxes(); // Reindex boxes to maintain order
+      isDrawing = false;
       alert("Box removed from initial state! Goal state reset.");
       resetGoalMapData();
     }

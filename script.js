@@ -423,18 +423,26 @@ goalSlider.addEventListener('change', () => {
 function wallsChangedInInitialState() {
   for (let y = 0; y < mapHeight; y++) {
     for (let x = 0; x < mapWidth; x++) {
-      // Check if the cell is a wall in the initial state but not in the goal state
-      if (mapData[y][x] === '+' && goalMapData[y][x] !== '+') {
+      const initialCell = mapData[y][x];
+      const goalCell = goalMapData[y][x];
+
+      // Check if the cell is a wall in the initial state but not a wall in the goal state
+      if (initialCell === '+' && !(goalCell === '+' || /^[0-9]$/.test(goalCell) || /^[a-z]$/.test(goalCell))) {
         return true; // Wall added or removed
       }
-      
+
       // Check if the cell is empty in the initial state but not in the goal state
-      if (mapData[y][x] === ' ' && goalMapData[y][x] !== ' ') {
-        return true; // Empty cell added or modified
+      if (initialCell === ' ') {
+        // Allow valid transformations: space, numbers ('0-9'), or letters ('a-z', 'A-Z')
+        const isValidGoalCell = goalCell === ' ' || /^[0-9]$/.test(goalCell) || /^[a-zA-Z]$/.test(goalCell);
+
+        if (!isValidGoalCell) {
+          return true; // Invalid modification of an empty cell
+        }
       }
     }
   }
-  return false; // No changes detected
+  return false; // No invalid changes detected
 }
 
 

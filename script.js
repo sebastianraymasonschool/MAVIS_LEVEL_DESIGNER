@@ -524,22 +524,31 @@ resetBtn.addEventListener('click', () => {
 
 // Export the map
 exportBtn.addEventListener('click', () => {
-  const hasGoals = goalMapData.some(row => row.some(cell => {
-    // A cell with a goal agent ('0') or a goal box ('A-Z') indicates a goal
-    return cell === '0' || /^[A-Z]$/.test(cell);
-  }));
+  const hasGoals = goalMapData.some(row => 
+    row.some(cell => {
+      // A cell with a goal agent ('0') or a goal box ('A-Z') indicates a goal
+      return cell === '0' || /^[A-Z]$/.test(cell);
+    })
+  );
 
   if (!hasGoals) {
     alert("The goal state has no goals! Please add at least one goal (agent or box) before exporting.");
     return; // Exit the function to prevent file export
   }
-let levelname = prompt('Enter level name (will be saved as .lvl format):', 'CUSTOMLEVEL');
-// Blue and then count the number of agents in the map for colors
-let colors = 'blue: ' + Array.from({ length: initialAgentCounter }, (_, i) => i).join(',');
-let initialState = mapData.map(row => row.join('')).join('\n');
-let goalState = goalMapData.map(row => row.join('')).join('\n');
-let mapText = 
-`#domain
+
+  let levelname = prompt('Enter level name (will be saved as .lvl format):', 'CUSTOMLEVEL');
+
+  // Blue and then count the number of agents in the map for colors
+  let colors = 'blue: ' + 
+    [
+      ...Array.from({ length: initialAgentCounter }, (_, i) => i), // Generate agent numbers
+      ...Array.from({ length: initialBoxCounter }, (_, i) => String.fromCharCode(65 + i)) // Generate box letters
+    ].join(',');
+
+  let initialState = mapData.map(row => row.join('')).join('\n');
+  let goalState = goalMapData.map(row => row.join('')).join('\n');
+  let mapText = 
+  `#domain
 hospital
 #levelname
 ${levelname}
@@ -550,16 +559,19 @@ ${initialState}
 #goal
 ${goalState}
 #end`;
-// Create a Blob from the map text and trigger a download
-const blob = new Blob([mapText], { type: 'text/plain' });
-const url = URL.createObjectURL(blob);
-const a = document.createElement('a');
- a.href = url;
- a.download = `${levelname}.lvl`;
- document.body.appendChild(a); // Append to the document
- a.click(); // Programmatically click the link to trigger download
- document.body.removeChild(a); // Remove the link after downloading
-URL.revokeObjectURL(url); // Clean up the URL object
+
+  // Create a Blob from the map text and trigger a download
+  const blob = new Blob([mapText], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${levelname}.lvl`;
+  document.body.appendChild(a); // Append to the document
+  a.click(); // Programmatically click the link to trigger download
+  document.body.removeChild(a); // Remove the link after downloading
+  URL.revokeObjectURL(url); // Clean up the URL object
 });
+
 // Initial grid setup
 createGrid();
+

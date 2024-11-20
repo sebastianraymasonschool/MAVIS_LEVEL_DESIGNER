@@ -194,6 +194,13 @@ function applyGoalTool(cell, x, y) {
 
   const currentValue = goalMapData[y][x]; // Get the current cell value
 
+  // Prevent placing agents or boxes on walls
+  if (currentValue === '+') {
+    alert("You cannot place agents or boxes on walls!");
+    isDrawing = false;
+    return;
+  }
+
   if (selectedType === 'remove') {
     // Handle removing agents or boxes
     if (!isNaN(currentValue) && currentValue !== ' ') {
@@ -215,6 +222,7 @@ function applyGoalTool(cell, x, y) {
   // Check if the cell is already occupied by an agent or a box
   if (!isNaN(currentValue) && currentValue !== ' ' || /^[A-Z]$/.test(currentValue)) {
     alert("This cell is already occupied by an agent or a box. Choose another cell.");
+    isDrawing = false;
     return;
   }
 
@@ -364,6 +372,7 @@ function applyTool(cell, x, y) {
       initialAgentCounter--; // Decrement the agent counter
       reindexAgents(); // Reindex agents to maintain order
       resetGoalMapData();
+      alert("Agent removed from initial state! Re-indexed and goal state reset.");
     } 
     // Remove a box if the cell contains an uppercase letter
     else if (/^[A-Z]$/.test(currentValue)) {
@@ -372,6 +381,7 @@ function applyTool(cell, x, y) {
       initialBoxCounter--; // Decrement the box counter
       reindexBoxes(); // Reindex boxes to maintain order
       resetGoalMapData();
+      alert("Box removed from initial state! Goal state reset.");
     }
     // Simply set the cell to empty if it contains other values
     else {

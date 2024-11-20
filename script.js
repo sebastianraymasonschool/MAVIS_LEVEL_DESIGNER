@@ -16,6 +16,9 @@ let initialBoxCounter = 0; // Counter for boxes in the initial state
 let goalAgentCounter = 0; // Counter for agents in the goal state
 let goalBoxCounter = 0; // Counter for boxes in the goal state
 
+let historyStack = []; // To store the grid's history
+
+
 // Initialize map data with walls on the perimeter and empty inside
 let mapData = Array.from({ length: mapHeight }, (_, y) =>
  Array.from({ length: mapWidth }, (_, x) =>
@@ -27,6 +30,15 @@ let goalMapData = Array.from({ length: mapHeight }, (_, y) =>
     (x === 0 || x === mapWidth - 1 || y === 0 || y === mapHeight - 1) ? '+' : ' '
   )
 );
+
+function saveCurrentState() {
+  const currentState = {
+    goalMapData: JSON.parse(JSON.stringify(goalMapData)), // Deep copy of the goal state
+    goalAgentCounter,
+    goalBoxCounter,
+  };
+  historyStack.push(currentState);
+}
 
 
 initialMap = JSON.parse(JSON.stringify(mapData)); // Copy initial map for future use
@@ -173,44 +185,92 @@ function drawGoal(cell, x, y) {
   }
 }
 
+let removedAgents = []; // Track removed agent numbers
+
 function applyGoalTool(cell, x, y) {
   if (x === 0 || x === mapWidth - 1 || y === 0 || y === mapHeight - 1) {
     return; // Skip perimeter cells
   }
 
-  // Clear the cell content
+  const currentValue = goalMapData[y][x]; // Get the current cell value
+
+  if (selectedType === 'remove') {
+    // Handle removing agents or boxes
+    if (!isNaN(currentValue) && currentValue !== ' ') {
+      // Remove agent
+      const agentNumber = parseInt(currentValue);
+      goalMapData[y][x] = ' ';
+      removedAgents.push(agentNumber); // Add removed agent number to the list
+      removedAgents.sort((a, b) => a - b); // Ensure the list remains sorted
+    } else if (/^[A-Z]$/.test(currentValue)) {
+      // Remove box
+      goalMapData[y][x] = ' ';
+      goalBoxCounter--; // Decrement box counter
+    }
+    cell.textContent = ''; // Clear the cell content visually
+    updateCellClass(cell, ' '); // Update the class to reflect empty space
+    return;
+  }
+
+  // Check if the cell is already occupied by an agent or a box
+  if (!isNaN(currentValue) && currentValue !== ' ' || /^[A-Z]$/.test(currentValue)) {
+    alert("This cell is already occupied by an agent or a box. Choose another cell.");
+    return;
+  }
+
+  // Clear the cell content visually (this will be updated below if valid)
   cell.innerHTML = '';
 
   if (selectedType === '0') {
-    // Add a goal agent
+    // Handle adding a goal agent
     const currentGoalAgents = goalMapData.flat().filter(cell => !isNaN(cell) && cell !== ' ').length;
     if (currentGoalAgents >= initialAgentCounter) {
       alert("Cannot add more agents in the goal state than exist in the initial state!");
       isDrawing = false;
       return;
     }
-    goalMapData[y][x] = goalAgentCounter.toString();
+
+    // Determine the agent number
+    let agentNumber;
+    if (removedAgents.length > 0) {
+      // Reuse the lowest removed agent number
+      agentNumber = removedAgents.shift(); // Remove the number from the list
+    } else {
+      // Use the next available number
+      agentNumber = goalAgentCounter;
+      goalAgentCounter++;
+    }
+
+    // Assign the agent number
+    goalMapData[y][x] = agentNumber.toString();
+
+    // Create a visual representation for the agent
     const agentCircle = document.createElement('div');
     agentCircle.className = 'agent-circle-goal'; // Use goal-specific class
-    agentCircle.textContent = goalAgentCounter.toString();
+    agentCircle.textContent = agentNumber.toString();
     cell.appendChild(agentCircle);
-    goalAgentCounter++; // Increment goal agent counter
+
     isDrawing = false; // Disable continuous painting for agents
   } else if (selectedType === '1') {
-    // Add a goal box const currentGoalBoxes = goalMapData.flat().filter(cell => /^[A-Z]$/.test(cell)).length;
- const currentGoalBoxes = goalMapData.flat().filter(cell => /^[A-Z]$/.test(cell)).length;
+    // Handle adding a goal box
+    const currentGoalBoxes = goalMapData.flat().filter(cell => /^[A-Z]$/.test(cell)).length;
     if (currentGoalBoxes >= initialBoxCounter) {
       alert("Cannot add more boxes in the goal state than exist in the initial state!");
       return;
     }
+
+    // Prompt for the box letter
     const boxLetter = prompt("Enter a letter for the box (a-z):", 'a');
     if (boxLetter && /^[a-z]$/.test(boxLetter)) {
       const upperBoxLetter = boxLetter.toUpperCase();
       goalMapData[y][x] = upperBoxLetter;
+
       const boxDiv = document.createElement('div');
       boxDiv.className = 'box-div-goal'; // Use goal-specific class
       boxDiv.textContent = upperBoxLetter;
       cell.appendChild(boxDiv);
+
+      goalBoxCounter++; // Increment goal box counter
     } else {
       alert("Invalid input. Please enter a single letter from a-z.");
       return;
@@ -224,6 +284,11 @@ function applyGoalTool(cell, x, y) {
   // Apply goal-specific styling
   cell.classList.add('cell-goal');
 }
+
+
+
+
+
 
 
 
@@ -283,52 +348,130 @@ function stopDrawing() {
 
 
 function applyTool(cell, x, y) {
+  // Skip if it's a perimeter cell
+  if (x === 0 || x === mapWidth - 1 || y === 0 || y === mapHeight - 1) {
+    return;
+  }
 
-// Skip if it's a perimeter cell
-if (x === 0 || x === mapWidth - 1 || y === 0 || y === mapHeight - 1) {
-return;
- }
-// Only allow drawing on walls or empty spaces
-if (mapData[y][x] === '+' || mapData[y][x] === ' ') {
-if (selectedType === '0') {
-// Check if we're exceeding the agent limit
-if (initialAgentCounter >= 10) {
-alert("Cannot place more than 10 agents on a map.");
- selectedType = ' '; // Switch to empty cell type
-return;
- }
-// Place a new agent if not already in the cell
- mapData[y][x] = initialAgentCounter.toString();
-// Create a circle div for the agent
-const agentCircle = document.createElement('div');
- agentCircle.className = 'agent-circle';
- agentCircle.textContent = initialAgentCounter.toString();
- cell.innerHTML = ''; // Clear existing contents
- cell.appendChild(agentCircle);
- initialAgentCounter++;
- } else if (selectedType === '1') {
- isDrawing = false; // Reset drawing state before the prompt
-// Prompt for a letter when placing a box
-const boxLetter = prompt("Enter a letter for the box (a-z):", 'a');
-if (boxLetter && /^[a-z]$/.test(boxLetter)) {
- mapData[y][x] = boxLetter.toUpperCase();
-const boxDiv = document.createElement('div');
- boxDiv.className = 'box-div';
- boxDiv.textContent = boxLetter.toUpperCase();
- cell.innerHTML = ''; // Clear existing contents
- cell.appendChild(boxDiv);
- initialBoxCounter ++;
- } else {
-alert("Invalid input. Please enter a single letter from a-z.");
- }
- } else {
-// For empty or wall cells, apply the selected type
- mapData[y][x] = selectedType;
- cell.textContent = selectedType;
- }
-updateCellClass(cell, mapData[y][x]);
- }
+  // Handle removing agents or boxes
+  if (selectedType === ' ') {
+    const currentValue = mapData[y][x];
+    
+    // Remove an agent if the cell contains a number
+    if (!isNaN(currentValue) && currentValue !== ' ') {
+      mapData[y][x] = ' ';
+      cell.textContent = '';
+      initialAgentCounter--; // Decrement the agent counter
+      reindexAgents(); // Reindex agents to maintain order
+    } 
+    // Remove a box if the cell contains an uppercase letter
+    else if (/^[A-Z]$/.test(currentValue)) {
+      mapData[y][x] = ' ';
+      cell.textContent = '';
+      initialBoxCounter--; // Decrement the box counter
+      reindexBoxes(); // Reindex boxes to maintain order
+    }
+    // Simply set the cell to empty if it contains other values
+    else {
+      mapData[y][x] = ' ';
+      cell.textContent = '';
+    }
+    updateCellClass(cell, ' '); // Update the class to reflect empty space
+    return; // Skip further processing
+  }
+
+  // Only allow drawing on walls or empty spaces
+  if (mapData[y][x] === '+' || mapData[y][x] === ' ') {
+    if (selectedType === '0') {
+      // Check if we're exceeding the agent limit
+      if (initialAgentCounter >= 10) {
+        alert("Cannot place more than 10 agents on a map.");
+        selectedType = ' '; // Switch to empty cell type
+        return;
+      }
+      // Place a new agent if not already in the cell
+      mapData[y][x] = initialAgentCounter.toString();
+      // Create a circle div for the agent
+      const agentCircle = document.createElement('div');
+      agentCircle.className = 'agent-circle';
+      agentCircle.textContent = initialAgentCounter.toString();
+      cell.innerHTML = ''; // Clear existing contents
+      cell.appendChild(agentCircle);
+      initialAgentCounter++;
+    } else if (selectedType === '1') {
+      isDrawing = false; // Reset drawing state before the prompt
+      // Prompt for a letter when placing a box
+      const boxLetter = prompt("Enter a letter for the box (a-z):", 'a');
+      if (boxLetter && /^[a-z]$/.test(boxLetter)) {
+        mapData[y][x] = boxLetter.toUpperCase();
+        const boxDiv = document.createElement('div');
+        boxDiv.className = 'box-div';
+        boxDiv.textContent = boxLetter.toUpperCase();
+        cell.innerHTML = ''; // Clear existing contents
+        cell.appendChild(boxDiv);
+        initialBoxCounter++;
+      } else {
+        alert("Invalid input. Please enter a single letter from a-z.");
+      }
+    } else {
+      // For empty or wall cells, apply the selected type
+      mapData[y][x] = selectedType;
+      cell.textContent = selectedType;
+    }
+    updateCellClass(cell, mapData[y][x]);
+  }
 }
+
+/**
+ * Reindex agents to maintain sequential numbering (0, 1, 2, ...)
+ */
+function reindexAgents() {
+  let agentIndex = 0;
+  for (let y = 0; y < mapHeight; y++) {
+    for (let x = 0; x < mapWidth; x++) {
+      if (!isNaN(mapData[y][x]) && mapData[y][x] !== ' ') {
+        mapData[y][x] = agentIndex.toString();
+        const cell = document.querySelector(`.cell[data-x="${x}"][data-y="${y}"]`);
+        if (cell) {
+          cell.innerHTML = '';
+          const agentCircle = document.createElement('div');
+          agentCircle.className = 'agent-circle';
+          agentCircle.textContent = agentIndex.toString();
+          cell.appendChild(agentCircle);
+        }
+        agentIndex++;
+      }
+    }
+  }
+  initialAgentCounter = agentIndex; // Update the agent counter
+}
+
+
+/**
+ * Reindex boxes to maintain sequential letters (A, B, C, ...)
+ */
+function reindexBoxes() {
+  const boxLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let boxIndex = 0;
+  for (let y = 0; y < mapHeight; y++) {
+    for (let x = 0; x < mapWidth; x++) {
+      if (/^[A-Z]$/.test(mapData[y][x])) {
+        mapData[y][x] = boxLetters[boxIndex];
+        const cell = document.querySelector(`.cell[data-x="${x}"][data-y="${y}"]`);
+        if (cell) {
+          cell.innerHTML = '';
+          const boxDiv = document.createElement('div');
+          boxDiv.className = 'box-div';
+          boxDiv.textContent = boxLetters[boxIndex];
+          cell.appendChild(boxDiv);
+        }
+        boxIndex++;
+      }
+    }
+  }
+  initialBoxCounter = boxIndex; // Update the box counter
+}
+
 
 // Control drawing with mouse events
 initialContainer.addEventListener('mousedown', (e) => {
@@ -444,6 +587,7 @@ function wallsChangedInInitialState() {
   }
   return false; // No invalid changes detected
 }
+
 
 
 /**
@@ -574,4 +718,3 @@ ${goalState}
 
 // Initial grid setup
 createGrid();
-

@@ -371,8 +371,8 @@ function applyTool(cell, x, y) {
       cell.textContent = '';
       initialAgentCounter--; // Decrement the agent counter
       reindexAgents(); // Reindex agents to maintain order
-      resetGoalMapData();
       alert("Agent removed from initial state! Re-indexed and goal state reset.");
+      resetGoalMapData();
     } 
     // Remove a box if the cell contains an uppercase letter
     else if (/^[A-Z]$/.test(currentValue)) {
@@ -380,8 +380,8 @@ function applyTool(cell, x, y) {
       cell.textContent = '';
       initialBoxCounter--; // Decrement the box counter
       reindexBoxes(); // Reindex boxes to maintain order
-      resetGoalMapData();
       alert("Box removed from initial state! Goal state reset.");
+      resetGoalMapData();
     }
     // Simply set the cell to empty if it contains other values
     else {

@@ -391,6 +391,7 @@ function applyTool(cell, x, y) {
       cell.textContent = '';
     }
     updateCellClass(cell, ' '); // Update the class to reflect empty space
+    isDrawing = false;
     return; // Skip further processing
   }
 

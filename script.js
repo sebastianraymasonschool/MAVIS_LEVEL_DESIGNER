@@ -381,7 +381,7 @@ function applyTool(cell, x, y) {
       mapData[y][x] = ' ';
       cell.textContent = '';
       initialBoxCounter--; // Decrement the box counter
-      reindexBoxes(); // Reindex boxes to maintain order
+      //reindexBoxes(); // Reindex boxes to maintain order
       isDrawing = false;
       alert("Box removed from initial state! Goal state reset.");
       resetGoalMapData();

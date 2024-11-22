@@ -374,6 +374,7 @@ function applyTool(cell, x, y) {
       isDrawing = false;
       alert("Agent removed from initial state! Re-indexed and goal state reset.");
       resetGoalMapData();
+      createGoalGrid()
     } 
     // Remove a box if the cell contains an uppercase letter
     else if (/^[A-Z]$/.test(currentValue)) {
@@ -384,6 +385,7 @@ function applyTool(cell, x, y) {
       isDrawing = false;
       alert("Box removed from initial state! Goal state reset.");
       resetGoalMapData();
+      createGoalGrid()
     }
     // Simply set the cell to empty if it contains other values
     else {
